@@ -20,7 +20,15 @@ class MessageQueue
 {
 public:
 
+    // typical behaviour methods
+    void send(T &&msg);
+    T receive();
+
 private:
+    // private members
+    std::mutex _mutex;
+    std::condition_variable _cond;
+    std::deque<T> _queue; // list of all objects of type TrafficLightPhase
     
 };
 
@@ -32,8 +40,8 @@ private:
 
 enum class TrafficLightPhase
 {
-    RED = 0,
-    GREEN = 1,
+    red,
+    green
 };
 
 class TrafficLight : public TrafficObject
@@ -41,7 +49,6 @@ class TrafficLight : public TrafficObject
 public:
     // constructor / desctructor
     TrafficLight();
-    ~TrafficLight();
 
     // getters / setters
     TrafficLightPhase getCurrentPhase() const { return _currentPhase; };
@@ -60,7 +67,7 @@ private:
     // FP.4b : create a private member of type MessageQueue for messages of type TrafficLightPhase 
     // and use it within the infinite loop to push each new TrafficLightPhase into it by calling 
     // send in conjunction with move semantics.
-
+    MessageQueue<TrafficLightPhase> _messageQueue;
     std::condition_variable _condition;
     std::mutex _mutex;
 };
